@@ -15,11 +15,11 @@ public class Evaluator {
             }
 
             // While char is '0'-'9' or '.', add to token, then push all to output.
-            if ((expression[i] >= 48 && expression[i] <= 57) || expression[i] == '.') {
+            if (Character.isDigit(expression[i]) || expression[i] == '.') {
                 String token = "";
                 int decCount = 0;
 
-                while (i < expression.length && ((expression[i] >= 48 && expression[i] <= 57) || expression[i] == '.')) {
+                while (i < expression.length && (Character.isDigit(expression[i]) || expression[i] == '.')) {
                     if (expression[i] == '.') decCount++;
                     token += expression[i];
                     i++;
@@ -35,10 +35,16 @@ public class Evaluator {
                 }
 
                 output.add(token);
+                i--;
                 continue;
             }
 
             if (expression[i] == '(') {
+                // Check for implicit multiplication before parentheses.
+                if (i != 0 && Character.isDigit(expression[i-1])) {
+                    operators.add("*");
+                }
+
                 // Evaluate everything within the parenthesis and push result to output.
                 i++;
                 String token = "";
@@ -49,6 +55,11 @@ public class Evaluator {
                 }
 
                 output.add(evaluate(token.toCharArray()) + "");
+
+                // Check for implicit multiplication after parentheses.
+                if (i + 1 < expression.length && (Character.isDigit(expression[i+1]) || expression[i+1] == '.')) {
+                    operators.add("*");
+                }
                 continue;
             }
 
@@ -57,6 +68,7 @@ public class Evaluator {
                     String o = operators.peek();
                     while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
                         output.add(operators.pop());
+                        if (operators.isEmpty()) break;
                         o = operators.peek();
                     }
                 }
@@ -74,6 +86,7 @@ public class Evaluator {
                         String o = operators.peek();
                         while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
                             output.add(operators.pop());
+                            if (operators.isEmpty()) break;
                             o = operators.peek();
                         }
                     }
@@ -87,6 +100,7 @@ public class Evaluator {
                     String o = operators.peek();
                     while (o.equals("*") || o.equals("/") || o.equals("^")) {
                         output.add(operators.pop());
+                        if (operators.isEmpty()) break;
                         o = operators.peek();
                     }
                 }
@@ -99,6 +113,7 @@ public class Evaluator {
                     String o = operators.peek();
                     while (o.equals("*") || o.equals("/") || o.equals("^")) {
                         output.add(operators.pop());
+                        if (operators.isEmpty()) break;
                         o = operators.peek();
                     }
                 }
@@ -114,7 +129,7 @@ public class Evaluator {
             // Functions.
             // sin, cos, tan, cot, ln, log
             // If char is a letter, get three-char function name and check if valid.
-            if ((expression[i] >= 65 && expression[i] <= 90) || (expression[i] >= 97 && expression[i] <= 122)) {
+            if (Character.isLetter(expression[i])) {
                 // Throw error if there is not enough room for a function name.
                 if (expression.length - i < 3) {
                     throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression.");
