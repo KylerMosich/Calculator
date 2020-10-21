@@ -39,13 +39,14 @@ class EvaluatorTest {
         assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("fdjhd".toCharArray()));
         assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("5+((3)".toCharArray()));
         assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("7/5)".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("1/0".toCharArray()));
 
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("9999999999999999999999".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("9999999999999999999999+99999999".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("9999999999999999999999-99999999".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("99999999999999999*99999999".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("9999999999999999999999/999999999999".toCharArray()));
-        assertThrows(IllegalArgumentException.class, () -> Evaluator.evaluate("99999999999999999^999999999999".toCharArray()));
+        String max = String.format("%.0f", Math.pow(2, 53));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate("1/0".toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate(("9" + max).toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate((max + "+" + max).toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate(("-" + max + "-" + max).toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate((max + "*" + max).toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate((max + "/" + 0.5).toCharArray()));
+        assertThrows(ArithmeticException.class, () -> Evaluator.evaluate((max + "^" + max).toCharArray()));
     }
 }

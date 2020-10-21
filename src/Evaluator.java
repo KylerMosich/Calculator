@@ -11,11 +11,15 @@ public class Evaluator {
 
     private static double evalRpn(Queue<String> output) {
         Stack<Double> numbers = new Stack<>();
-        double ret = 0;
+        final double MAX = Math.pow(2, 53); // Highest integer that can be stored with full precision in a double.
+
+
         while (!output.isEmpty()) {
             String element = output.remove();
             try {
                 numbers.push(Double.parseDouble(element));
+                if (Math.abs(numbers.peek()) > MAX)
+                    throw new ArithmeticException("Invalid Input - Expression becomes too large.");
             } catch (NumberFormatException e) {
                 double x;
                 double y;
@@ -26,7 +30,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "-":
@@ -37,7 +41,7 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(y - x);
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "*":
@@ -46,7 +50,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "/":
@@ -57,7 +61,7 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(y / x);
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "^":
@@ -68,7 +72,7 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(Math.pow(y, x));
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "sin":
@@ -77,7 +81,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "cos":
@@ -86,7 +90,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "tan":
@@ -95,7 +99,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "cot":
@@ -105,7 +109,7 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(Math.cos(x) / Math.sin(x));
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "log":
@@ -114,7 +118,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                     case "ln":
@@ -123,7 +127,7 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (numbers.peek() == Double.POSITIVE_INFINITY || numbers.peek() == Double.NEGATIVE_INFINITY)
+                        if (Math.abs(numbers.peek()) > MAX)
                             throw new ArithmeticException("Invalid Input - Expression becomes too large.");
                         break;
                 }
@@ -146,6 +150,10 @@ public class Evaluator {
             if (expression[i] == 'π') {
                 output.add(Math.PI + "");
                 continue;
+            }
+
+            if (expression[i] == ')') {
+                throw new IllegalArgumentException("Invalid Input - ')' without matching '('");
             }
 
             // While char is '0'-'9' or '.', add to token, then push all to output.
@@ -185,8 +193,12 @@ public class Evaluator {
                 int parenCount = 1;
 
                 while (true) {
-                    if (expression[i] == '(') parenCount++;
-                    else if (expression[i] == ')') parenCount--;
+                    try {
+                        if (expression[i] == '(') parenCount++;
+                        else if (expression[i] == ')') parenCount--;
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        throw new IllegalArgumentException("Invalid Input - '(' without matching ')'");
+                    }
 
                     if (parenCount == 0) break;
                     token += expression[i];
