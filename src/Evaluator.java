@@ -18,8 +18,8 @@ public class Evaluator {
             String element = output.remove();
             try {
                 numbers.push(Double.parseDouble(element));
-                if (Math.abs(numbers.peek()) > MAX)
-                    throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                if (Math.abs(numbers.peek()) >= MAX)
+                    throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
             } catch (NumberFormatException e) {
                 double x;
                 double y;
@@ -30,8 +30,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "-":
                         try {
@@ -41,8 +41,8 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(y - x);
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "*":
                         try {
@@ -50,8 +50,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "/":
                         try {
@@ -61,8 +61,8 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(y / x);
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "^":
                         try {
@@ -72,8 +72,8 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(Math.pow(y, x));
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "sin":
                         try {
@@ -81,8 +81,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "cos":
                         try {
@@ -90,8 +90,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "tan":
                         try {
@@ -99,8 +99,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "cot":
                         try {
@@ -109,8 +109,8 @@ public class Evaluator {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
                         numbers.push(Math.cos(x) / Math.sin(x));
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "log":
                         try {
@@ -118,8 +118,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                     case "ln":
                         try {
@@ -127,8 +127,8 @@ public class Evaluator {
                         } catch (EmptyStackException ex) {
                             throw new IllegalArgumentException("Invalid Input - Operator without operands.");
                         }
-                        if (Math.abs(numbers.peek()) > MAX)
-                            throw new ArithmeticException("Invalid Input - Expression becomes too large.");
+                        if (Math.abs(numbers.peek()) >= MAX)
+                            throw new ArithmeticException("Invalid Input - Expression becomes too large or undefined.");
                         break;
                 }
             }
@@ -169,11 +169,11 @@ public class Evaluator {
 
                 // Throw error if last digit is decimal point.
                 if (expression[i - 1] == '.') {
-                    throw new IllegalArgumentException("Invalid expression - Number ends with '.'");
+                    throw new IllegalArgumentException("Invalid Input - Number ends with '.'");
                 }
                 // Throw error if token has multiple decimal points.
                 if (decCount > 1) {
-                    throw new IllegalArgumentException("Invalid expression - Number has more than one '.'");
+                    throw new IllegalArgumentException("Invalid Input - Number has more than one '.'");
                 }
 
                 output.add(token);
@@ -283,7 +283,8 @@ public class Evaluator {
             if (Character.isLetter(expression[i])) {
                 // Throw error if there is not enough room for a function name.
                 if (expression.length - i < 3) {
-                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression.");
+                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression."
+                    + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
                 }
 
                 String token = "" + expression[i] + expression[i + 1] + expression[i + 2];
@@ -308,7 +309,8 @@ public class Evaluator {
                         i--; // ln is shorter than the rest, so offset i.
                         break;
                     default:
-                        throw new IllegalArgumentException("Invalid Input - Incorrect function name.");
+                        throw new IllegalArgumentException("Invalid Input - Incorrect function name."
+                        + " Valid functions are sin(), cos(), tan(), cot(), log(), and ln().");
                 }
                 i += 2; // Move i to after the function name.
                 continue;

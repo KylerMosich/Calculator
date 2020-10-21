@@ -4,6 +4,11 @@ import java.util.Stack;
 
 public class App {
     public static void main(String[] args) {
+        if (args.length == 0) {
+            System.err.println("No input given. Please provide a mathematical expression as arguments.");
+            return;
+        }
+
         // Concatenate all command line arguments into String.
         String input = "";
         for (String arg : args) input += arg;
