@@ -15,21 +15,21 @@ public class Evaluator {
             }
 
             // While char is '0'-'9' or '.', add to token, then push all to output.
-            if ((expression[i] >= 30 && expression[i] <= 39) || expression[i] == '.') {
+            if ((expression[i] >= 48 && expression[i] <= 57) || expression[i] == '.') {
                 String token = "";
                 int decCount = 0;
 
-                while ((expression[i] >= 30 && expression[i] <= 39) || expression[i] == '.') {
+                while (i < expression.length && ((expression[i] >= 48 && expression[i] <= 57) || expression[i] == '.')) {
                     if (expression[i] == '.') decCount++;
                     token += expression[i];
                     i++;
                 }
 
-                // Return error if last digit is decimal point.
+                // Throw error if last digit is decimal point.
                 if (expression[i-1] == '.') {
                     throw new IllegalArgumentException("Invalid expression - Number ends with '.'");
                 }
-                // Return error if token has multiple decimal points.
+                // Throw error if token has multiple decimal points.
                 if (decCount > 1) {
                     throw new IllegalArgumentException("Invalid expression - Number has more than one '.'");
                 }
@@ -111,41 +111,48 @@ public class Evaluator {
                 continue;
             }
 
-            //     case '-':
-            //         // Subtract/Negate
-            //         break;
-            //     case '*':
-            //         // Multiply
-            //         break;
-            //     case '/':
-            //         // Divide
-            //         break;
-            //     case '^':
-            //         // Exponent
-            //         break;
-            // }
+            // Functions.
+            // sin, cos, tan, cot, ln, log
+            // If char is a letter, get three-char function name and check if valid.
+            if ((expression[i] >= 65 && expression[i] <= 90) || (expression[i] >= 97 && expression[i] <= 122)) {
+                // Throw error if there is not enough room for a function name.
+                if (expression.length - i < 3) {
+                    throw new IllegalArgumentException("Invalid Input - Incorrect function name at end of expression.");
+                }
 
+                String token = "" + expression[i] + expression[i+1] + expression[i+2];
+                switch (token.toLowerCase()) {
+                    case "sin":
+                        operators.push("sin");
+                        break;
+                    case "cos":
+                        operators.push("cos");
+                        break;
+                    case "tan":
+                        operators.push("tan");
+                        break;
+                    case "cot":
+                        operators.push("cot");
+                        break;
+                    case "log":
+                        operators.push("log");
+                        break;
+                    case "ln(":
+                        operators.push("ln");
+                        i--; // ln is shorter than the rest, so offset i.
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Invalid Input - Incorrect function name.");
+                }
+                i += 3; // Move i to after the function name.
+                continue;
+            }
 
-
-            //         // sin, cos, tan, cot, ln, log
-            //     case 's':
-            //         // sin
-            //         break;
-            //     case 'c':
-            //         // cos/cot
-            //         break;
-            //     case 't':
-            //         // tan
-            //         break;
-            //     case 'l':
-            //         // ln/log
-            //         break;
-            //     default:
-            //         // Handle numbers
-            //         if (true);
-
-
+            throw new IllegalArgumentException("Invalid Input - Incorrect character in expression.");
         }
+
+        while (!operators.isEmpty()) output.add(operators.pop());
+
         return 0;
     }
 }
