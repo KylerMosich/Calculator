@@ -13,7 +13,7 @@ public class App {
         // Print expression solution.
         try {
             System.out.println(Evaluator.evaluate(expression));
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | ArithmeticException e) {
             System.err.println(e.getMessage());
         } catch (Exception e) {
             System.err.println("An unknown error occurred!"
