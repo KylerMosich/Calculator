@@ -4,6 +4,7 @@ import java.util.Stack;
 
 public class App {
     public static void main(String[] args) {
+        // Cancel execution if there is no input.
         if (args.length == 0) {
             System.err.println("No input given. Please provide a mathematical expression as arguments.");
             return;

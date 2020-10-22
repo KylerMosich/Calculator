@@ -4,18 +4,31 @@ import java.util.Queue;
 import java.util.Stack;
 
 public class Evaluator {
+    /**
+     * Evaluate infix expression and return the result.
+     * @param expression the infix expression to be evaluated.
+     * @return a double containing the final result.
+     */
     public static double evaluate(char[] expression) {
         Queue<String> output = shunt(expression);
         return evalRpn(output);
     }
 
+    /**
+     * Evaluate postfix expression and return the result.
+     * @param output the postfix expression to be evaluated.
+     * @return a double containing the final result.
+     */
     private static double evalRpn(Queue<String> output) {
         Stack<Double> numbers = new Stack<>();
         final double MAX = Math.pow(2, 53); // Highest integer that can be stored with full precision in a double.
 
-
+        // Handle each element in the output until it is empty.
         while (!output.isEmpty()) {
             String element = output.remove();
+
+            // If the element is a valid double within the legal range, push to stack.
+            // Otherwise, check which operator it is.
             try {
                 numbers.push(Double.parseDouble(element));
                 if (Math.abs(numbers.peek()) >= MAX)
@@ -23,6 +36,7 @@ public class Evaluator {
             } catch (NumberFormatException e) {
                 double x;
                 double y;
+                // Handle operator.
                 switch (element) {
                     case "+":
                         try {
@@ -133,11 +147,21 @@ public class Evaluator {
                 }
             }
         }
+
+        // Throw exception if there are too many numbers in stack.
+        if (numbers.size() > 1)
+            throw new IllegalArgumentException("Invalid Input - Operand without operator.");
+
         return numbers.pop();
     }
 
+    /**
+     * Convert infix expression to postfix expression.
+     * @param expression the infix expression to be converted.
+     * @return a Queue of Strings representing each token of the postfix expression.
+     */
     private static Queue<String> shunt(char[] expression) {
-        // Parse expression with Shunting-Yard algorithm by Edsger Dijkstra.
+        // Parse expression with (modified) Shunting-Yard algorithm by Edsger Dijkstra.
         Stack<String> operators = new Stack<>();
         Queue<String> output = new LinkedList<>();
 
@@ -147,6 +171,7 @@ public class Evaluator {
                 break;
             }
 
+            // Throw exception if ) is found before (.
             if (expression[i] == ')') {
                 throw new IllegalArgumentException("Invalid Input - ')' without matching '('");
             }
@@ -192,14 +217,18 @@ public class Evaluator {
                         if (expression[i] == '(') parenCount++;
                         else if (expression[i] == ')') parenCount--;
                     } catch (ArrayIndexOutOfBoundsException e) {
+                        // Throw exception if whole expression is parsed without finding ).
                         throw new IllegalArgumentException("Invalid Input - '(' without matching ')'");
                     }
 
+                    // Stop iterating when all ( are matched with ).
                     if (parenCount == 0) break;
+
                     token += expression[i];
                     i++;
                 }
 
+                // Add solution to sub-expression in place of the parentheses.
                 output.add(evaluate(token.toCharArray()) + "");
 
                 // Check for implicit multiplication after parentheses.
@@ -209,6 +238,7 @@ public class Evaluator {
                 continue;
             }
 
+            // Handle addition.
             if (expression[i] == '+') {
                 if (!operators.isEmpty()) {
                     String o = operators.peek();
@@ -222,12 +252,14 @@ public class Evaluator {
                 continue;
             }
 
+            // Handle subtraction/unary negation.
             if (expression[i] == '-') {
+                // Check for unary negation, then treat it as multiplying by -1.
                 if (i == 0 || expression[i - 1] == '(' || expression[i - 1] == '+' || expression[i - 1] == '-'
                         || expression[i - 1] == '*' || expression[i - 1] == '/' || expression[i - 1] == '^') {
                     operators.push("*");
                     output.add("-1");
-                } else {
+                } else { // Handle subtraction.
                     if (!operators.isEmpty()) {
                         String o = operators.peek();
                         while (o.equals("+") || o.equals("-") || o.equals("*") || o.equals("/") || o.equals("^")) {
@@ -241,6 +273,7 @@ public class Evaluator {
                 continue;
             }
 
+            // Handle multiplication.
             if (expression[i] == '*') {
                 if (!operators.isEmpty()) {
                     String o = operators.peek();
@@ -254,6 +287,7 @@ public class Evaluator {
                 continue;
             }
 
+            // Handle division.
             if (expression[i] == '/') {
                 if (!operators.isEmpty()) {
                     String o = operators.peek();
@@ -267,13 +301,14 @@ public class Evaluator {
                 continue;
             }
 
+            // Handle exponents.
             if (expression[i] == '^') {
                 operators.push("^");
                 continue;
             }
 
-            // Functions.
-            // sin, cos, tan, cot, ln, log
+            // Functions //
+
             // If char is a letter, get three-char function name and check if valid.
             if (Character.isLetter(expression[i])) {
                 // Throw error if there is not enough room for a function name.
@@ -311,9 +346,11 @@ public class Evaluator {
                 continue;
             }
 
+            // If character is still not handled, is illegal.
             throw new IllegalArgumentException("Invalid Input - Incorrect character in expression.");
         }
 
+        // Move all remaining operators to output, then return.
         while (!operators.isEmpty()) output.add(operators.pop());
 
         return output;
