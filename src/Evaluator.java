@@ -147,11 +147,6 @@ public class Evaluator {
                 break;
             }
 
-            if (expression[i] == 'π') {
-                output.add(Math.PI + "");
-                continue;
-            }
-
             if (expression[i] == ')') {
                 throw new IllegalArgumentException("Invalid Input - ')' without matching '('");
             }
